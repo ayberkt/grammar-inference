@@ -1,13 +1,15 @@
 {-# LANGUAGE UnicodeSyntax #-}
 
 module Derivation
-  ( Derivation(..), completeTop)
+  ( Derivation(..), completeTop, completeAll, getAllTypes)
 where
 
 import           Atom    (Atom (..))
 import           Classes
 import           Rule    (Rule (..))
 import           Type    (Type (..))
+import Data.Maybe (catMaybes)
+
 
 data Derivation
   = Node Rule Type Derivation Derivation
@@ -36,30 +38,28 @@ changeType :: Type → Derivation → Derivation
 changeType τ (Node r _ d1 d2) = Node r τ d1 d2
 changeType τ (Leaf _ w)       = Leaf τ w
 
-complete :: Derivation → Int → Derivation
+complete :: Derivation → Int → (Derivation, Int)
 complete (Node Slash τ d1 d2) st =
   let τ2 = if hasNoType d2 then Unknown st else getType d2
       st' = succ st
       τ1 = (τ `S` τ2)
-      d1' = complete (changeType τ1 d1) st'
-      st'' = succ st'
-      d2' = complete (changeType τ2 d2) st''
-  in Node Slash τ d1' d2'
+      (d1', st'') = complete (changeType τ1 d1) st'
+      (d2', st''') = complete (changeType τ2 d2) st''
+  in (Node Slash τ d1' d2', st''')
 complete (Node Backslash τ d1 d2) st =
   let τ1 = if hasNoType d1 then Unknown st else getType d1
       st' = succ st
       τ2 = (τ1 `B` τ)
-      d2' = complete (changeType τ2 d2) st'
-      st'' = succ st
-      d1' = complete (changeType τ1 d1) st''
-  in  Node Backslash τ d1' d2'
-complete (Leaf r w) st = Leaf r w
+      (d2', st'') = complete (changeType τ2 d2) st'
+      (d1', st''') = complete (changeType τ1 d1) st''
+  in  (Node Backslash τ d1' d2', st''')
+complete (Leaf r w) st = (Leaf r w, st)
 
-completeTop :: Derivation → Derivation
-completeTop (Node r _ d1 d2) =
-  complete (Node r (AtomicType Sentence) d1 d2) 1
-completeTop (Leaf r w) =
-  complete (Leaf r w) 1
+completeTop :: Derivation → Int → (Derivation, Int)
+completeTop (Node r _ d1 d2) st =
+  complete (Node r (AtomicType Sentence) d1 d2) st
+completeTop (Leaf r w) st =
+  complete (Leaf r w) st
 
 -- TODO
 extractConstraints :: Derivation → [(String, Type)]
@@ -69,6 +69,14 @@ extractConstraints (Leaf τ w) =
   [(w, τ)]
 
 -- TODO
-makeProblem :: [Derivation] → [(Type, Type)]
-makeProblem [] = []
-makeProblem (d:ds) = error "Implement me!"
+completeAll :: [Derivation] → [Derivation]
+completeAll derivations =
+  let completeAll' :: [Derivation] → Int → [Derivation]
+      completeAll' [] _ = []
+      completeAll' (d:ds) st =
+        let (completed, st') = completeTop d st
+        in completed : (completeAll' ds st')
+  in completeAll' derivations 1
+
+getAllTypes :: [Derivation] → [(String, Type)]
+getAllTypes = concat . (map extractConstraints)
