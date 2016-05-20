@@ -60,3 +60,12 @@ completeTop (Node r _ d1 d2) =
   complete (Node r (AtomicType Sentence) d1 d2) 1
 completeTop (Leaf r w) =
   complete (Leaf r w) 1
+
+-- TODO
+extractConstraints :: Derivation [(String, Form)]
+extractConstraints = error "Implement me!"
+
+-- TODO
+makeProblem :: [Derivation] → [(String, Form)]
+makeProblem [] = []
+makeProblem (d:ds) = error "Implement me!"
