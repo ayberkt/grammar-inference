@@ -10,9 +10,13 @@ import Classes
 
 data Type
   = None
+    -- Type variable
   | Unknown   Int
+    -- Atomic type such as n, np, or S.
   | AtomicType  Atom
+    -- Slash type.
   | S     Type Type
+    -- Backslash type.
   | B     Type Type
   deriving (Eq, Show)
 
