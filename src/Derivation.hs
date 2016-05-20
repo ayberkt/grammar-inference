@@ -62,10 +62,13 @@ completeTop (Leaf r w) =
   complete (Leaf r w) 1
 
 -- TODO
-extractConstraints :: Derivation [(String, Form)]
-extractConstraints = error "Implement me!"
+extractConstraints :: Derivation → [(String, Type)]
+extractConstraints (Node r τ d1 d2) =
+  extractConstraints d1 ++ extractConstraints d2
+extractConstraints (Leaf τ w) =
+  [(w, τ)]
 
 -- TODO
-makeProblem :: [Derivation] → [(String, Form)]
+makeProblem :: [Derivation] → [(Type, Type)]
 makeProblem [] = []
 makeProblem (d:ds) = error "Implement me!"
