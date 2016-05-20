@@ -11,13 +11,13 @@ import Classes
 data Type
   = None
     -- Type variable
-  | Unknown   Int
+  | Unknown Int
     -- Atomic type such as n, np, or S.
-  | AtomicType  Atom
+  | AtomicType Atom
     -- Slash type.
-  | S     Type Type
+  | Type `S` Type
     -- Backslash type.
-  | B     Type Type
+  |Type `B` Type
   deriving (Eq, Show)
 
 isNone :: Type → Bool
