@@ -1,14 +1,17 @@
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE UnicodeSyntax #-}
 
 module Derivation
   ( Derivation(..), completeTop, completeAll, getAllTypes)
 where
 
-import           Atom    (Atom (..))
+import           Atom                (Atom (..))
 import           Classes
-import           Rule    (Rule (..))
-import           Type    (Type (..))
-import Data.Maybe (catMaybes)
+import           Data.List           (intercalate)
+import           Rule                (Rule (..))
+import           Type                (Type (..))
+
+import qualified Data.HashMap.Strict as H
 
 
 data Derivation
@@ -78,5 +81,18 @@ completeAll derivations =
         in completed : (completeAll' ds st')
   in completeAll' derivations 1
 
-getAllTypes :: [Derivation] → [(String, Type)]
-getAllTypes = concat . (map extractConstraints)
+getAllTypes :: [Derivation] → H.HashMap String [Type]
+getAllTypes ds =
+  let bindings = concat . map extractConstraints $ ds
+      update :: H.HashMap String [Type] → (String, Type) → H.HashMap String [Type]
+      update h (s, τ) =
+        case H.lookup s h of
+          Just τs → H.insert s (τ : τs) h
+          Nothing → H.insert s [τ] h
+  in foldl update H.empty bindings
+
+pretty' (s, τs) = s ++ " " ++ (intercalate ", " $ pretty <$> τs) ++ "\n"
+
+instance Pretty (H.HashMap String [Type]) where
+
+  pretty x = concat $ pretty' <$> H.toList x

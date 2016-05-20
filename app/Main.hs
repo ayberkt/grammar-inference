@@ -23,5 +23,5 @@ examples = [example1, example2]
 
 main :: IO ()
 main = do
-  let printPair (x, y) = putStrLn $ (show x) ++ " : " ++ pretty y
-  mapM_ printPair . getAllTypes . completeAll $ examples
+  -- let printPair (x, y) = putStrLn $ (show x) ++ " : " ++ pretty y
+  prettyPrint $ getAllTypes . completeAll $ examples
