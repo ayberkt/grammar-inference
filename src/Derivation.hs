@@ -42,14 +42,14 @@ complete :: Derivation → Int → (Derivation, Int)
 complete (Node Slash τ d1 d2) st =
   let τ2 = if hasNoType d2 then Unknown st else getType d2
       st' = succ st
-      τ1 = (τ `S` τ2)
+      τ1 = (τ :/: τ2)
       (d1', st'') = complete (changeType τ1 d1) st'
       (d2', st''') = complete (changeType τ2 d2) st''
   in (Node Slash τ d1' d2', st''')
 complete (Node Backslash τ d1 d2) st =
   let τ1 = if hasNoType d1 then Unknown st else getType d1
       st' = succ st
-      τ2 = (τ1 `B` τ)
+      τ2 = (τ1 :\: τ)
       (d2', st'') = complete (changeType τ2 d2) st'
       (d1', st''') = complete (changeType τ1 d1) st''
   in  (Node Backslash τ d1' d2', st''')

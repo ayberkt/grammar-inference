@@ -15,9 +15,9 @@ data Type
     -- Atomic type such as n, np, or S.
   | AtomicType Atom
     -- Slash type.
-  | Type `S` Type
+  | Type :/: Type
     -- Backslash type.
-  |Type `B` Type
+  | Type :\: Type
   deriving (Eq, Show)
 
 isNone :: Type → Bool
@@ -29,7 +29,7 @@ instance Pretty Type where
   pretty (Unknown n) = "x" ++ show n
   pretty None        = "None"
   pretty (AtomicType x)    = pretty x
-  pretty (x `S` y)
+  pretty (x :/: y)
     = "(" ++ pretty x ++ " / " ++ pretty y ++ ")"
-  pretty (x `B` y)
+  pretty (x :\: y)
     = "(" ++ pretty x ++ " \\ " ++ pretty y ++ ")"
