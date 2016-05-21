@@ -3,12 +3,12 @@
 module Main where
 
 import           Classes
+-- import           Data.List   (intercalate)
 import           Derivation  (Derivation (..), completeAll, getAllTypes,
-                              makeProblem)
+                              makeProblem, modifyTypes)
 import           Rule        (Rule (..))
 import           Type        (Type (..))
-import           Unification (unify, applyUnifier)
-import Data.List (intercalate)
+import           Unification (applyUnifier, unify)
 
 
 example1 :: Derivation
@@ -27,11 +27,12 @@ examples = [example1, example2]
 main :: IO ()
 main = do
   -- let printPair (x, y) = putStrLn $ (show x) ++ " : " ++ pretty y
-  let problem = makeProblem . getAllTypes . completeAll $ examples
+  let completedExamples = completeAll examples
+      problem = makeProblem . getAllTypes $ completedExamples
   prettyPrint problem
   putStrLn "Solution\n--------------"
   case unify problem of
     Just unifier →
-      let solution = map ((applyUnifier unifier) . fst) problem
-      in putStrLn $ intercalate "\n" (map pretty solution)
+      let solution = map (modifyTypes (applyUnifier unifier)) completedExamples
+      in prettyPrint $ getAllTypes solution
     Nothing → print "Constraints do not unify."

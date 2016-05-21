@@ -3,6 +3,7 @@
 
 module Derivation
   ( Derivation(..)
+  , modifyTypes
   , completeTop
   , completeAll
   , getAllTypes
@@ -41,9 +42,12 @@ getType :: Derivation → Type
 getType (Node _ τ _ _) = τ
 getType (Leaf τ _)     = τ
 
+modifyTypes :: (Type → Type) → Derivation → Derivation
+modifyTypes f (Node r τ d1 d2) = Node r (f τ) d1 d2
+modifyTypes f (Leaf τ w) = Leaf (f τ) w
+
 changeType :: Type → Derivation → Derivation
-changeType τ (Node r _ d1 d2) = Node r τ d1 d2
-changeType τ (Leaf _ w)       = Leaf τ w
+changeType τ = modifyTypes (\_ → τ)
 
 complete :: Derivation → Int → (Derivation, Int)
 complete (Node Slash τ d1 d2) st =
