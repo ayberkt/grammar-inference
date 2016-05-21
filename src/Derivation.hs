@@ -7,12 +7,13 @@ module Derivation
   , completeTop
   , completeAll
   , getAllTypes
+  , getFinalTypes
   , makeProblem)
 where
 
 import           Atom                (Atom (..))
 import           Classes
-import           Data.List           (intercalate)
+import           Data.List           (intercalate, nub)
 import           Rule                (Rule (..))
 import           Type                (Type (..))
 
@@ -100,6 +101,9 @@ getAllTypes ds =
           Nothing → H.insert s [τ] h
   in foldl update H.empty bindings
 
+
+getFinalTypes :: [Derivation] → H.HashMap String [Type]
+getFinalTypes = H.map nub . getAllTypes
 -- TODO: implement.
 makeProblem :: H.HashMap String [Type] → [(Type, Type)]
 makeProblem bindings =
