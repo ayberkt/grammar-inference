@@ -43,11 +43,12 @@ getType (Node _ τ _ _) = τ
 getType (Leaf τ _)     = τ
 
 modifyTypes :: (Type → Type) → Derivation → Derivation
-modifyTypes f (Node r τ d1 d2) = Node r (f τ) d1 d2
+modifyTypes f (Node r τ d1 d2) = Node r (f τ) (modifyTypes f d1) (modifyTypes f d2)
 modifyTypes f (Leaf τ w) = Leaf (f τ) w
 
 changeType :: Type → Derivation → Derivation
-changeType τ = modifyTypes (\_ → τ)
+changeType τ' (Node r _ d1 d2) = Node r τ' d1 d2
+changeType τ' (Leaf _ w)       = Leaf τ' w
 
 complete :: Derivation → Int → (Derivation, Int)
 complete (Node Slash τ d1 d2) st =
@@ -86,7 +87,7 @@ completeAll derivations =
       completeAll' [] _ = []
       completeAll' (d:ds) st =
         let (completed, st') = completeTop d st
-        in completed : (completeAll' ds st')
+        in completed : (completeAll' ds (succ st'))
   in completeAll' derivations 1
 
 getAllTypes :: [Derivation] → H.HashMap String [Type]
@@ -102,14 +103,14 @@ getAllTypes ds =
 -- TODO: implement.
 makeProblem :: H.HashMap String [Type] → [(Type, Type)]
 makeProblem bindings =
-  let makeProblem' [] = []
-      makeProblem' (k:ks) =
+  let makeProblem' [] _ = []
+      makeProblem' (k:ks) st =
         let types =
               case H.lookup k bindings of
-                Just ts → [(t1, t2) | t1 ← ts, t2 ← ts, t1 < t2]
+                Just ts → [(Unknown st, t) | t ← ts ]
                 Nothing → []
-        in types ++ makeProblem' ks
-  in makeProblem' (H.keys bindings)
+        in types ++ makeProblem' ks (succ st)
+  in makeProblem' (H.keys bindings) 30
 
 instance Pretty ([(Type, Type)]) where
 

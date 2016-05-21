@@ -21,8 +21,13 @@ example2 = Node Backslash None
              (Node Slash None (Leaf None "a") (Leaf None "fish"))
              (Node Backslash None (Leaf None "swims") (Leaf None "fast"))
 
+example3 :: Derivation
+example3 = Node Backslash None
+             (Node Slash None (Leaf None "a") (Leaf None "human"))
+             (Node Backslash None (Leaf None "swims") (Leaf None "fast"))
+
 examples :: [Derivation]
-examples = [example1, example2]
+examples = [example1, example2, example3]
 
 main :: IO ()
 main = do
