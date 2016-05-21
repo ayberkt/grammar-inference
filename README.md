@@ -36,19 +36,20 @@ infer -- --verbose`. This gives the following output:
 ```
 I will attempt to unify the following constraints
 --------------------------------------------------
-swims x5, (x1 \ S)
-a (x4 / x6), (x1 / x2)
-fish x6
-man x2
-fast (x5 \ (x4 \ S))
+swims: x5, (x1 \ S)
+a: (x4 / x6), (x1 / x2)
+fish: x6
+man: x2
+fast: (x5 \ (x4 \ S))
 
 Solution
 --------------------------------------------------
-swims (x1 \ S)
-a (x1 / x2)
-fish x2
-man x2
-fast ((x1 \ S) \ (x1 \ S))
+swims: (x1 \ S)
+a: (x1 / x2)
+fish: x2
+man: x2
+fast: ((x1 \ S) \ (x1 \ S))
+
 ```
 
 # References
