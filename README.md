@@ -14,10 +14,11 @@ Here's an example from Moot and Retoré (2000); consider the following sentences
 We represent such a derivation with missing types with the `Derivation` type
 defined in `Derivation.hs`. These look like follows:
 
+
 ```haskell
 example1 :: Derivation
 example1 = Node Backslash None
-             (Node Slash None (Leaf None "a") (Leaf None "man"))
+             (Node Slash None (Leaf None "a") (Leaf (AtomicType Noun) "man"))
              (Leaf None "swims")
 
 example2 :: Derivation
@@ -37,19 +38,18 @@ infer -- --verbose`. This gives the following output:
 I will attempt to unify the following constraints
 --------------------------------------------------
 swims: x5, (x1 \ S)
-a: (x4 / x6), (x1 / x2)
+a: (x4 / x6), (x1 / N)
 fish: x6
-man: x2
+man: N
 fast: (x5 \ (x4 \ S))
 
 Solution
 --------------------------------------------------
 swims: (x1 \ S)
-a: (x1 / x2)
-fish: x2
-man: x2
+a: (x1 / N)
+fish: N
+man: N
 fast: ((x1 \ S) \ (x1 \ S))
-
 ```
 
 # References

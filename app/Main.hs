@@ -4,6 +4,7 @@ module Main where
 
 import           Classes
 -- import           Data.List   (intercalate)
+import           Atom                (Atom (..))
 import qualified Data.HashMap.Strict as H
 import           Derivation          (Derivation (..), completeAll, getAllTypes,
                                       getFinalTypes, makeProblem, modifyTypes)
@@ -15,7 +16,7 @@ import           Unification         (applyUnifier, unify)
 
 example1 :: Derivation
 example1 = Node Backslash None
-             (Node Slash None (Leaf None "a") (Leaf None "man"))
+             (Node Slash None (Leaf None "a") (Leaf (AtomicType Noun) "man"))
              (Leaf None "swims")
 
 example2 :: Derivation
