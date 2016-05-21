@@ -11,7 +11,7 @@ import Classes
 data Type
   = None
     -- Type variable
-  | Unknown Int
+  | Unknown String Int
     -- Atomic type such as n, np, or S.
   | AtomicType Atom
     -- Slash type.
@@ -26,7 +26,7 @@ isNone _    = False
 
 instance Pretty Type where
 
-  pretty (Unknown n) = "x" ++ show n
+  pretty (Unknown x n) = x ++ show n
   pretty None        = "None"
   pretty (AtomicType x)    = pretty x
   pretty (x :/: y)
