@@ -2,7 +2,11 @@
 {-# LANGUAGE UnicodeSyntax #-}
 
 module Derivation
-  ( Derivation(..), completeTop, completeAll, getAllTypes)
+  ( Derivation(..)
+  , completeTop
+  , completeAll
+  , getAllTypes
+  , makeProblem)
 where
 
 import           Atom                (Atom (..))
@@ -92,9 +96,22 @@ getAllTypes ds =
   in foldl update H.empty bindings
 
 -- TODO: implement.
-makeProblem :: H.HashMap String [Type] → (Type, Type)
-makeProblem bindings σ = undefined
+makeProblem :: H.HashMap String [Type] → [(Type, Type)]
+makeProblem bindings =
+  let makeProblem' [] = []
+      makeProblem' (k:ks) =
+        let types =
+              case H.lookup k bindings of
+                Just ts → [(t1, t2) | t1 ← ts, t2 ← ts, t1 < t2]
+                Nothing → []
+        in types ++ makeProblem' ks
+  in makeProblem' (H.keys bindings)
 
+instance Pretty ([(Type, Type)]) where
+
+  pretty [] = ""
+  pretty ((t1, t2):ts) =
+    pretty t1 ++ "  =  " ++ pretty t2 ++ "\n" ++ pretty ts
 
 instance Pretty (H.HashMap String [Type]) where
 
