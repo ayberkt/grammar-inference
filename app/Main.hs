@@ -4,12 +4,13 @@ module Main where
 
 import           Classes
 -- import           Data.List   (intercalate)
-import           Derivation         (Derivation (..), completeAll, getAllTypes,
-                                     getFinalTypes, makeProblem, modifyTypes)
-import           Rule               (Rule (..))
-import           System.Environment (getArgs)
-import           Type               (Type (..))
-import           Unification        (applyUnifier, unify)
+import qualified Data.HashMap.Strict as H
+import           Derivation          (Derivation (..), completeAll, getAllTypes,
+                                      getFinalTypes, makeProblem, modifyTypes)
+import           Rule                (Rule (..))
+import           System.Environment  (getArgs)
+import           Type                (Type (..))
+import           Unification         (applyUnifier, unify)
 
 
 example1 :: Derivation
@@ -25,12 +26,18 @@ example2 = Node Backslash None
 examples :: [Derivation]
 examples = [example1, example2]
 
+learn :: [Derivation] → Maybe (H.HashMap String [Type])
+learn ss =
+  let completedExamples = completeAll ss
+  in case unify (makeProblem . getAllTypes $ completedExamples) of
+    Just unifier → Just . getFinalTypes $ map (modifyTypes (applyUnifier unifier)) completedExamples
+    Nothing → Nothing
+
 main :: IO ()
 main = do
   -- let printPair (x, y) = putStrLn $ (show x) ++ " : " ++ pretty y
   args ← getArgs
   let completedExamples = completeAll examples
-      problem = makeProblem . getAllTypes $ completedExamples
   if "--verbose" `elem` args
   then do
          putStrLn "I will attempt to unify the following constraints"
@@ -38,8 +45,6 @@ main = do
          prettyPrint $ getAllTypes completedExamples
   else return ()
   putStrLn "Solution\n--------------------------------------------------"
-  case unify problem of
-    Just unifier →
-      let solution = map (modifyTypes (applyUnifier unifier)) completedExamples
-      in prettyPrint $ getFinalTypes solution
-    Nothing → print "Constraints do not unify."
+  case learn examples of
+    Just xs → prettyPrint xs
+    Nothing → putStrLn "Examples do not unify"
