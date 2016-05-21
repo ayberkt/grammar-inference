@@ -126,5 +126,5 @@ instance Pretty (H.HashMap String [Type]) where
 
   pretty x =
       let pretty' (s, τs) =
-            s ++ " " ++ (intercalate ", " $ pretty <$> τs) ++ "\n"
+            s ++ ": " ++ (intercalate ", " $ pretty <$> τs) ++ "\n"
       in concat $ pretty' <$> H.toList x
