@@ -1,7 +1,7 @@
 # grammar-inference
 
 This is an implementation of Buszkowski and Penn's RG algorithm (1990) for AB
-grammars (classical categorial grammars). Given a set of positive examples (i.e,
+grammars (classical categorial grammars). Given a set of positive examples (i.e.,
 correct sentences), it infers the grammar that generated those sentences.
 
 Here's an example from Moot and Retoré (2000); consider the following sentences:
@@ -27,10 +27,11 @@ example2 = Node Backslash None
 ```
 
 We simply call `learn` on the list containing these examples. In the case that
-the examples unify, the grammar is returned as a `HashMap String [Type]`. You
-can build with `stack build` and run these examples with `stack exec infer`. If
-you want to see the generated unification problem as well, run `stack exec infer
--- --verbose`. This gives the following output:
+the examples unify, the grammar is returned as a `HashMap String [Type]`.
+
+You can build with `stack build` and run these examples with `stack exec infer`.
+If you want to see the generated unification problem as well, run `stack exec
+infer -- --verbose`. This gives the following output:
 
 ```
 I will attempt to unify the following constraints
