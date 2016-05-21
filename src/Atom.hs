@@ -9,7 +9,7 @@ data Atom
   | NounPhrase
   | Noun
   | Infinitive
-  deriving (Eq, Show)
+  deriving (Eq, Ord, Show)
 
 instance Pretty Atom where
 

@@ -18,7 +18,7 @@ data Type
   | Type :/: Type
     -- Backslash type.
   | Type :\: Type
-  deriving (Eq, Show)
+  deriving (Eq, Ord, Show)
 
 isNone :: Type → Bool
 isNone None = True

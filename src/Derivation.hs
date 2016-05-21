@@ -65,10 +65,10 @@ completeTop (Leaf r w) st =
   complete (Leaf r w) st
 
 -- TODO
-extractConstraints :: Derivation → [(String, Type)]
-extractConstraints (Node r τ d1 d2) =
-  extractConstraints d1 ++ extractConstraints d2
-extractConstraints (Leaf τ w) =
+getTypes :: Derivation → [(String, Type)]
+getTypes (Node _ _ d1 d2) =
+  getTypes d1 ++ getTypes d2
+getTypes (Leaf τ w) =
   [(w, τ)]
 
 -- TODO
@@ -83,7 +83,7 @@ completeAll derivations =
 
 getAllTypes :: [Derivation] → H.HashMap String [Type]
 getAllTypes ds =
-  let bindings = concat . map extractConstraints $ ds
+  let bindings = concat . map getTypes $ ds
       update :: H.HashMap String [Type] → (String, Type) → H.HashMap String [Type]
       update h (s, τ) =
         case H.lookup s h of
@@ -91,8 +91,14 @@ getAllTypes ds =
           Nothing → H.insert s [τ] h
   in foldl update H.empty bindings
 
-pretty' (s, τs) = s ++ " " ++ (intercalate ", " $ pretty <$> τs) ++ "\n"
+-- TODO: implement.
+makeProblem :: H.HashMap String [Type] → (Type, Type)
+makeProblem bindings σ = undefined
+
 
 instance Pretty (H.HashMap String [Type]) where
 
-  pretty x = concat $ pretty' <$> H.toList x
+  pretty x =
+      let pretty' (s, τs) =
+            s ++ " " ++ (intercalate ", " $ pretty <$> τs) ++ "\n"
+      in concat $ pretty' <$> H.toList x
