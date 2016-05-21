@@ -3,7 +3,7 @@
 
 module Derivation
   ( Derivation(..)
-  , modifyTypes
+  , modifyAllTypes
   , completeTop
   , completeAll
   , getAllTypes
@@ -20,11 +20,17 @@ import           Type                (Type (..))
 import qualified Data.HashMap.Strict as H
 
 
+-- | The @Derivation@ type represents a type derivation. The "axioms" are always
+-- the words whose type come from the lexicon. At each @Node@ we mark the
+-- corresponding rule as well as the @Type@. Note that the @Type@ type has a
+-- constructor @None@ to represent the absence of a @Type@: these are
+-- reconstructed by the @complete@ function.
 data Derivation
   = Node Rule Type Derivation Derivation
   | Leaf Type String
   deriving (Eq, Show)
 
+-- | Pretty printing for the @Derivation@ type.
 instance Pretty Derivation where
 
   pretty (Node r τ d1 d2)
@@ -34,22 +40,26 @@ instance Pretty Derivation where
       in " [" ++ rs ++ x2s ++ x3s ++ "]" ++ ":" ++ pretty τ ++ " "
   pretty (Leaf τ w) = " " ++ show w ++ ":" ++ pretty τ
 
+-- | Check if a given @Derivation@ node has no type.
 hasNoType :: Derivation → Bool
 hasNoType (Node _ None _ _) = True
 hasNoType (Leaf None _)     = True
 hasNoType _                 = False
 
+-- | Get the type at a given @Derivation@ node.
 getType :: Derivation → Type
 getType (Node _ τ _ _) = τ
 getType (Leaf τ _)     = τ
 
-modifyTypes :: (Type → Type) → Derivation → Derivation
-modifyTypes f (Node r τ d1 d2) = Node r (f τ) (modifyTypes f d1) (modifyTypes f d2)
-modifyTypes f (Leaf τ w) = Leaf (f τ) w
-
 changeType :: Type → Derivation → Derivation
 changeType τ' (Node r _ d1 d2) = Node r τ' d1 d2
 changeType τ' (Leaf _ w)       = Leaf τ' w
+
+-- | Given a function @f :: Type -> Type@, apply this function to all types in a
+-- derivation tree.
+modifyAllTypes :: (Type → Type) → Derivation → Derivation
+modifyAllTypes f (Node r τ d1 d2) = Node r (f τ) (modifyAllTypes f d1) (modifyAllTypes f d2)
+modifyAllTypes f (Leaf τ w) = Leaf (f τ) w
 
 complete :: Derivation → Int → (Derivation, Int)
 complete (Node Slash τ d1 d2) st =
