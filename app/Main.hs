@@ -30,7 +30,8 @@ learn :: [Derivation] → Maybe (H.HashMap String Type)
 learn ss =
   let completedExamples = completeAll ss
   in case unify (makeProblem . getAllTypes $ completedExamples) of
-    Just unifier → Just . H.map head . getAllTypes $ map (modifyAllTypes (applyUnifier unifier)) completedExamples
+    Just unifier → Just . H.map head . getAllTypes $
+                     (modifyAllTypes (applyUnifier unifier)) <$> completedExamples
     Nothing → Nothing
 
 main :: IO ()

@@ -1,6 +1,8 @@
 {-# LANGUAGE UnicodeSyntax #-}
 
-module Unification where
+module Unification
+       (unify, applyUnifier)
+where
 
 import Type (Type(..))
 import Data.HashMap.Strict as H
