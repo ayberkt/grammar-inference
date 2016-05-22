@@ -7,13 +7,12 @@ module Derivation
   , completeTop
   , completeAll
   , getAllTypes
-  , getFinalTypes
   , makeProblem)
 where
 
 import           Atom                (Atom (..))
 import           Classes
-import           Data.List           (intercalate, nub)
+import           Data.List           (intercalate)
 import           Rule                (Rule (..))
 import           Type                (Type (..))
 
@@ -84,14 +83,12 @@ completeTop (Node r _ d1 d2) st =
 completeTop (Leaf r w) st =
   complete (Leaf r w) st
 
--- TODO
 getTypes :: Derivation → [(String, Type)]
 getTypes (Node _ _ d1 d2) =
   getTypes d1 ++ getTypes d2
 getTypes (Leaf τ w) =
   [(w, τ)]
 
--- TODO
 completeAll :: [Derivation] → [Derivation]
 completeAll derivations =
   let completeAll' :: [Derivation] → Int → [Derivation]
@@ -101,6 +98,9 @@ completeAll derivations =
         in completed : (completeAll' ds (succ st'))
   in completeAll' derivations 1
 
+-- | Given list of derivations @ds@, get all the type bindings from all the
+-- derivations as a @HashMap String [Type]@ where each word corresponds to its
+-- different types obtained from different sentences.
 getAllTypes :: [Derivation] → H.HashMap String [Type]
 getAllTypes ds =
   let bindings = concat . map getTypes $ ds
@@ -111,10 +111,7 @@ getAllTypes ds =
           Nothing → H.insert s [τ] h
   in foldl update H.empty bindings
 
-
-getFinalTypes :: [Derivation] → H.HashMap String [Type]
-getFinalTypes = H.map nub . getAllTypes
--- TODO: implement.
+-- | Given type constraints, makes a unification problem out of it.
 makeProblem :: H.HashMap String [Type] → [(Type, Type)]
 makeProblem bindings =
   let makeProblem' [] _ = []
@@ -138,3 +135,10 @@ instance Pretty (H.HashMap String [Type]) where
       let pretty' (s, τs) =
             s ++ ": " ++ (intercalate ", " $ pretty <$> τs) ++ "\n"
       in concat $ pretty' <$> H.toList x
+
+
+instance Pretty (H.HashMap String Type) where
+
+  pretty x =
+    let pretty' (s, τ) = s ++ ": " ++ pretty τ ++ "\n"
+    in concat $ pretty' <$> H.toList x

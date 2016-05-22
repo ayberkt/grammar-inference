@@ -2,12 +2,11 @@
 
 module Main where
 
-import           Classes
--- import           Data.List   (intercalate)
 import           Atom                (Atom (..))
+import           Classes
 import qualified Data.HashMap.Strict as H
 import           Derivation          (Derivation (..), completeAll, getAllTypes,
-                                      getFinalTypes, makeProblem, modifyTypes)
+                                      makeProblem, modifyAllTypes)
 import           Rule                (Rule (..))
 import           System.Environment  (getArgs)
 import           Type                (Type (..))
@@ -27,11 +26,11 @@ example2 = Node Backslash None
 examples :: [Derivation]
 examples = [example1, example2]
 
-learn :: [Derivation] → Maybe (H.HashMap String [Type])
+learn :: [Derivation] → Maybe (H.HashMap String Type)
 learn ss =
   let completedExamples = completeAll ss
   in case unify (makeProblem . getAllTypes $ completedExamples) of
-    Just unifier → Just . getFinalTypes $ map (modifyTypes (applyUnifier unifier)) completedExamples
+    Just unifier → Just . H.map head . getAllTypes $ map (modifyAllTypes (applyUnifier unifier)) completedExamples
     Nothing → Nothing
 
 main :: IO ()
