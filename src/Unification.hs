@@ -6,6 +6,7 @@ where
 
 import Type (Type(..))
 import Data.HashMap.Strict as H
+import Control.Arrow ((***))
 
 type Problem = [(Type, Type)]
 type Unifier = H.HashMap Int Type
@@ -16,7 +17,7 @@ subst _ _ None = error "At this point, no types should be missing."
 subst n x (Unknown k)
   = if k == n then x else Unknown k
 subst _ _ (AtomicType a) = AtomicType a
-subst n x (τ1 :/: τ2) = (subst n x τ1) :/: (subst n x τ2)
+subst n x (τ1 :/: τ2) = subst n x τ1 :/: subst n x τ2
 subst n x (τ1 :\: τ2) = subst n x τ1 :\: subst n x τ2
 
 occurs :: Type → Type → Bool
@@ -36,9 +37,9 @@ applyUnifier σ x =
 
 unify :: Problem → Maybe Unifier
 unify [] = Just H.empty
-unify (((s1 :/: s2), (t1 :/: t2)) : ss) =
+unify ((s1 :/: s2, t1 :/: t2) : ss) =
   unify $ (s1, t1) : (s2, t2) : ss
-unify (((s1 :\: s2), (t1 :\: t2)) : ss) =
+unify ((s1 :\: s2, t1 :\: t2) : ss) =
   unify $ (s1, t1) : (s2, t2) : ss
 unify ((s, t):ss) =
   if s == t
@@ -46,7 +47,7 @@ unify ((s, t):ss) =
   else case s of
          Unknown x → eliminate (Unknown x) t ss
          _ → case t of
-               Unknown y → unify $ ((Unknown y), s) : ss
+               Unknown y → unify $ (Unknown y, s) : ss
                _ → Nothing
 
 eliminate :: Type → Type → Problem → Maybe Unifier
@@ -55,7 +56,7 @@ eliminate (Unknown x) t ss =
   then Nothing
   else
     let xt = applyUnifier (H.fromList [(x, t)])
-        ss' = (\(t1, t2) → (xt t1, xt t2)) <$> ss
+        ss' = (xt *** xt) <$> ss
     in case unify ss' of
       Just σ' →
         let xt' = applyUnifier σ'
