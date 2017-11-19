@@ -3,7 +3,7 @@ version:             0.1.0.0
 synopsis:            Grammatical inference for classical categorial grammars.
 description:         Please see README.md
 homepage:            https://github.com/ayberkt/grammar-inference#readme
-license:             MIT
+license:             GPLv3
 license-file:        LICENSE
 author:              Ayberk Tosun
 maintainer:          ayberk.tosun@gmail.com
